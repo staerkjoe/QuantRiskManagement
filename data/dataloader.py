@@ -1,4 +1,3 @@
-# src/data/loader.py
 import pandas as pd
 from ucimlrepo import fetch_ucirepo
 from config.config import DataConfig
@@ -41,8 +40,20 @@ class DataLoader:
         df = df.rename(columns=self.attribute_mapping)
         return df
     
+    def load_data(self) -> pd.DataFrame:
+        """Load and prepare complete dataset with target transformation."""
+        df = self.load_raw_data()
+        df = self.prepare_target(df)
+        return df
+    
     def prepare_target(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Convert target variable: 1=Good -> 1, 2=Bad -> 0."""
+        """Convert target variable: 1=Good Credit -> 0, 2=Bad Credit -> 1.
+        
+        Note: After transformation:
+        - 0 = Good Credit (negative class, majority)
+        - 1 = Bad Credit (positive class, minority - what we want to detect)
+        """
         df = df.copy()
-        df["credit_risk"] = df["credit_risk"].map({1: 1, 2: 0})
+        df["credit_risk"] = df["credit_risk"].map({1: 0, 2: 1})
+        print(f"Target transformation applied: {df['credit_risk'].value_counts().to_dict()}")
         return df
