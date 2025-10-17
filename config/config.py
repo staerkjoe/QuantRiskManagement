@@ -38,8 +38,8 @@ class WandBConfig:
     project: str = "QuantitativeRiskManagement"
     run_name: str = "BaseRun"
     tags: List[str] = None
-    api_key: str = "API_KEY_PLACEHOLDER"
-    entity: str = "EntityName"
+    api_key: str = "1e4211a4b1feb397a67944a37634fd6d0b72686b"
+    entity: str = "jojs-it-universitetet-i-k-benhavn"
 
 @dataclass
 class LogRegWandBConfig(WandBConfig):
