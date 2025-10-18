@@ -8,7 +8,7 @@ class DataConfig:
     """Data loading and preprocessing configuration."""
     dataset_id: int = 144  # UCI ML Repo ID
     test_size: float = 0.2
-    random_state: int = 19
+    random_state: int = 21
     
     # Feature groups
     ordinal_features: List[str] = None

@@ -163,3 +163,29 @@ class WandBLogger:
     def finish(self):
         """Finish the W&B run."""
         wandb.finish()
+
+    def log_feature_importance(self, 
+                              model: BaseEstimator, 
+                              feature_names: list,
+                              top_n: int = 20,
+                              show_direction: bool = False):
+        """Log feature importance visualization.
+        
+        Args:
+            model: Trained model (supports LogisticRegression, XGBoost, or Pipeline)
+            feature_names: List of feature names
+            top_n: Number of top features to display
+            show_direction: If True, show coefficient direction (only for LogReg)
+        """
+        fig = self.visualizer.plot_feature_importance(
+            model=model,
+            feature_names=feature_names,
+            top_n=top_n,
+            title=f"{self.model_name} - Feature Importance",
+            show_direction=show_direction
+        )
+        
+        wandb.log({"feature_importance": wandb.Image(fig)})
+        plt.close(fig)
+        
+        print(f"Feature importance plot logged to W&B")

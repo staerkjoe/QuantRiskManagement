@@ -58,12 +58,15 @@ def main():
     xgb_wandb_config = XGBWandBConfig()
     logger = WandBLogger(model_name='xgboost', config=xgb_wandb_config.__dict__)
     all_model_params = best_model.get_params()
+    feature_names = X_train.columns.tolist() if hasattr(X_train, 'columns') else [f'feature_{i}' for i in range(X_train.shape[1])]
+
 
     logger.log_hyperparameters(all_model_params)
     logger.log_metrics(metrics)
     logger.log_confusion_matrix(y_test, y_test_pred)
     logger.log_precision_recall_curve(y_test, y_test_prob)
     logger.log_model_artifact(best_model)
+    logger.log_feature_importance(model=best_model,feature_names=feature_names,top_n=20,show_direction=True)
     
     print(f"Best F1 Score: {metrics['test_f1']:.4f}")
     print(f"Best Parameters: {grid_search.best_params_}")

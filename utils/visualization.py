@@ -128,3 +128,89 @@ class ModelVisualizer:
         
         plt.tight_layout()
         return fig
+    
+    def plot_feature_importance(self,
+                               model,
+                               feature_names: list,
+                               top_n: int = 20,
+                               title: str = "Feature Importance",
+                               show_direction: bool = False) -> plt.Figure:
+        """
+        Plot feature importance for both logistic regression and tree-based models.
+        
+        Args:
+            model: Trained model (LogisticRegression, XGBoost, or Pipeline)
+            feature_names: List of feature names
+            top_n: Number of top features to display
+            title: Plot title
+            show_direction: If True, show coefficient direction (only for LogReg)
+            
+        Returns:
+            matplotlib Figure object
+        """
+        # Extract the actual model if it's a pipeline
+        if hasattr(model, 'named_steps'):
+            actual_model = model.named_steps.get('classifier') or model.named_steps.get('model') or model[-1]
+        else:
+            actual_model = model
+        
+        # Extract feature importances based on model type
+        if hasattr(actual_model, 'feature_importances_'):
+            # Tree-based models (XGBoost, RandomForest, etc.)
+            importances = actual_model.feature_importances_
+            coefficients = None
+            model_type = "Tree-based"
+        elif hasattr(actual_model, 'coef_'):
+            # Linear models (LogisticRegression, etc.)
+            if len(actual_model.coef_.shape) > 1:
+                coefficients = actual_model.coef_[0]
+            else:
+                coefficients = actual_model.coef_
+            importances = np.abs(coefficients)
+            model_type = "Logistic Regression"
+        else:
+            raise ValueError("Model must have either 'feature_importances_' or 'coef_' attribute")
+        
+        # Debug: Check length mismatch
+        print(f"\nDEBUG - Feature names length: {len(feature_names)}")
+        print(f"DEBUG - Importances length: {len(importances)}")
+        
+        # Handle length mismatch
+        if len(feature_names) != len(importances):
+            print(f"WARNING: Feature names ({len(feature_names)}) don't match importances ({len(importances)})")
+            print("Using generic feature names instead.")
+            feature_names = [f'feature_{i}' for i in range(len(importances))]
+        
+        # Create DataFrame for easier manipulation
+        importance_df = pd.DataFrame({
+            'feature': feature_names,
+            'importance': importances,
+            'coefficient': coefficients if coefficients is not None else importances
+        }).sort_values('importance', ascending=False).head(top_n)
+        
+        # Create plot
+        fig, ax = plt.subplots(figsize=(10, max(6, top_n * 0.3)))
+        
+        if show_direction and coefficients is not None:
+            # Plot with direction (for logistic regression)
+            colors = ['#2ecc71' if x > 0 else '#e74c3c' for x in importance_df['coefficient']]
+            bars = ax.barh(range(len(importance_df)), importance_df['coefficient'], color=colors, alpha=0.7)
+            ax.axvline(x=0, color='black', linestyle='--', linewidth=1)
+            ax.set_xlabel('Coefficient Value', fontsize=11)
+            plot_title = f'{title}\n(Green=Increases Risk, Red=Decreases Risk)'
+        else:
+            # Plot absolute importance
+            bars = ax.barh(range(len(importance_df)), importance_df['importance'], 
+                          color='steelblue', alpha=0.7)
+            ax.set_xlabel('Importance Score', fontsize=11)
+            plot_title = f'{title} ({model_type})'
+        
+        ax.set_yticks(range(len(importance_df)))
+        ax.set_yticklabels(importance_df['feature'], fontsize=9)
+        ax.set_ylabel('Features', fontsize=11)
+        ax.set_title(plot_title, fontsize=13, fontweight='bold')
+        ax.invert_yaxis()
+        ax.grid(axis='x', alpha=0.3)
+        
+        plt.tight_layout()
+        return fig

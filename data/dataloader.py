@@ -54,6 +54,6 @@ class DataLoader:
         - 1 = Bad Credit (positive class, minority - what we want to detect)
         """
         df = df.copy()
-        df["credit_risk"] = df["credit_risk"].map({1: 0, 2: 1})
+        df["credit_risk"] = df["credit_risk"].map({1: 1, 2: 0})
         print(f"Target transformation applied: {df['credit_risk'].value_counts().to_dict()}")
         return df
