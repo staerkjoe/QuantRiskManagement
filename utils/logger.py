@@ -106,6 +106,24 @@ class WandBLogger:
         wandb.log({f"{dataset}_precision_recall_curve": wandb.Image(fig)})
         plt.close(fig)
     
+    def log_roc_curve(self, y_true: np.ndarray, y_prob: np.ndarray, dataset: str = "test", pos_label: int = 1):
+        """Log ROC curve with AUC score.
+        
+        Args:
+            y_true: True binary labels
+            y_prob: Predicted probabilities for the positive class
+            dataset: Dataset name (e.g., "test", "train")
+            pos_label: Label of the positive class (default: 1 for bad credit)
+        """
+        fig = self.visualizer.plot_roc_curve(
+            y_true, y_prob,
+            pos_label=pos_label,
+            title=f"{self.model_name} - {dataset.title()} ROC Curve"
+        )
+        
+        wandb.log({f"{dataset}_roc_curve": wandb.Image(fig)})
+        plt.close(fig)
+    
     def log_model_artifact(self, model: BaseEstimator, description: str = None):
         """Save and log best model as W&B artifact."""
         if description is None:

@@ -62,6 +62,7 @@ def main():
 
     logger.log_metrics(metrics)
     logger.log_confusion_matrix(y_test, y_test_pred)
+    logger.log_roc_curve(y_test, y_test_prob)
     logger.log_precision_recall_curve(y_test, y_test_prob)
     logger.log_model_artifact(best_model)
     

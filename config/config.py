@@ -44,7 +44,7 @@ class WandBConfig:
 @dataclass
 class LogRegWandBConfig(WandBConfig):
     """Logistic Regression specific W&B configuration."""
-    run_name: str = "LogReg1"
+    run_name: str = "LogReg2"
     
     def __post_init__(self):
         if self.tags is None:
@@ -53,7 +53,7 @@ class LogRegWandBConfig(WandBConfig):
 @dataclass
 class XGBWandBConfig(WandBConfig):
     """XGBoost specific W&B configuration."""
-    run_name: str = "XGBoost1"
+    run_name: str = "XGBoost2"
     
     def __post_init__(self):
         if self.tags is None:

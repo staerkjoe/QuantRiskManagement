@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
-from sklearn.metrics import confusion_matrix, precision_recall_curve, f1_score
+from sklearn.metrics import confusion_matrix, precision_recall_curve, f1_score, roc_curve, auc
 from typing import Tuple, Optional
 import pandas as pd
 
@@ -122,6 +122,53 @@ class ModelVisualizer:
         ax.set_ylabel("Precision", fontsize=12)
         ax.set_title(title, fontsize=14)
         ax.legend(fontsize=10)
+        ax.grid(True, alpha=0.3)
+        ax.set_xlim([0, 1])
+        ax.set_ylim([0, 1])
+        
+        plt.tight_layout()
+        return fig
+    
+    def plot_roc_curve(self,
+                      y_true: np.ndarray,
+                      y_prob: np.ndarray,
+                      pos_label: int = 1,
+                      title: str = "ROC Curve") -> plt.Figure:
+        """
+        Generate an ROC curve plot with AUC score.
+        
+        Args:
+            y_true: True binary labels (0=Good Credit, 1=Bad Credit after preprocessing)
+            y_prob: Predicted probabilities for the positive class (class 1)
+            pos_label: Label of the positive class (default: 1 for bad credit)
+            title: Plot title
+            
+        Returns:
+            matplotlib Figure object
+        """
+        # If y_prob is 2D (probabilities for both classes), extract probability for positive class
+        if len(y_prob.shape) > 1 and y_prob.shape[1] > 1:
+            y_prob_positive = y_prob[:, pos_label]
+        else:
+            y_prob_positive = y_prob
+        
+        # Calculate ROC curve and AUC
+        fpr, tpr, thresholds = roc_curve(y_true, y_prob_positive, pos_label=pos_label)
+        roc_auc = auc(fpr, tpr)
+        
+        # Create plot
+        fig, ax = plt.subplots(figsize=self.figsize)
+        
+        # Plot ROC curve
+        ax.plot(fpr, tpr, linewidth=2, label=f'ROC Curve (AUC = {roc_auc:.3f})', color='darkorange')
+        
+        # Plot diagonal reference line
+        ax.plot([0, 1], [0, 1], 'k--', linewidth=1, label='Random Classifier (AUC = 0.500)')
+        
+        ax.set_xlabel('False Positive Rate', fontsize=12)
+        ax.set_ylabel('True Positive Rate', fontsize=12)
+        ax.set_title(title, fontsize=14)
+        ax.legend(loc='lower right', fontsize=10)
         ax.grid(True, alpha=0.3)
         ax.set_xlim([0, 1])
         ax.set_ylim([0, 1])
