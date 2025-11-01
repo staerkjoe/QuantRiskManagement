@@ -7,8 +7,8 @@ class LogRegConfig:
     C: float = 0.0001
     solver: str = "liblinear"
     max_iter: int = 2000
-    class_weight: str = "balanced"
-    use_smote: bool = True
+    class_weight: str = None
+    use_smote: bool = False
     
     # GridSearch parameters
     param_grid: dict = None

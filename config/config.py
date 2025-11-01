@@ -44,20 +44,20 @@ class WandBConfig:
 @dataclass
 class LogRegWandBConfig(WandBConfig):
     """Logistic Regression specific W&B configuration."""
-    run_name: str = "LogReg2"
+    run_name: str = "LogReg4"
     
     def __post_init__(self):
         if self.tags is None:
-            self.tags = ["LogReg", "Smote"]
+            self.tags = ["NoSmote", "PrecisionOptimized"] #PrecisionOptimized F1Optimized
 
 @dataclass
 class XGBWandBConfig(WandBConfig):
     """XGBoost specific W&B configuration."""
-    run_name: str = "XGBoost2"
+    run_name: str = "XGBoost3"
     
     def __post_init__(self):
         if self.tags is None:
-            self.tags = ["XGBoost", "NoSmote"]
+            self.tags = ["XGBoost", "NoSmote", "PrecisionOptimized"]
 
 @dataclass
 class ModelConfig:

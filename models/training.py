@@ -21,7 +21,7 @@ class LogRegTrainer:
             pipeline,
             self.model_config.param_grid,
             cv=self.model_config.cv_folds,
-            scoring="f1",
+            scoring="precision",
             n_jobs=-1,
             verbose=2
         )
@@ -52,7 +52,7 @@ class XGBTrainer:
             pipeline,
             self.model_config.param_grid,
             cv=self.model_config.cv_folds,
-            scoring="f1",
+            scoring="precision",
             n_jobs=-1,
             verbose=2
         )
